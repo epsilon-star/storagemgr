@@ -8,7 +8,7 @@ from cryptography.fernet import Fernet
 
 DEFAULT_METADATA = {
     'files':[
-       
+
     ],
     'folders':[
 
@@ -47,7 +47,7 @@ class Volume:
     def correctVolume(vol:int): # type: ignore
         for x in range(10):
             if vol > (1 * ((2**(10)) * x)):
-                return Volume.formatVolume(vol)
+                return Volume.formatVolume(vol) # type: ignore
 
 class Encrypt:
     def __init__(self,key:bytes):
@@ -254,13 +254,17 @@ class Storage:
             bfile = fs.read()
             fs.close()
         offset = None
-        for x in blocks:
-            if len(bfile) <= abs(x[1]-x[0]):
-                offset = x
-        if offset:
-            block = [path,fname,offset[0],len(bfile)]
+        if len(self.metadata['files']):
+            for x in blocks:
+                if len(bfile) <= abs(x[1]-x[0]):
+                    offset = x
+            if offset:
+                block = [path,fname,offset[0],len(bfile)]
+            else:
+                block = [path,fname,metadata['files'][-1][2] + metadata['files'][-1][3],len(bfile)]
         else:
-            block = [path,fname,metadata['files'][-1][2] + metadata['files'][-1][3],len(bfile)]
+            offset = self.header[0] + self.header[1] + self.header[2]
+            block = [path,fname,offset,len(bfile)]
         self.metadata['files'].append(block)
         self.updateMetadata()
         self.writeData(self.spath,block[2],block[3],bfile)
@@ -378,7 +382,10 @@ class Storage:
 
     def changePath(self,path:str):
         output = ''
-        if path == '/':
+        print(path)
+        if path == '..':
+            output = self.path[:len(self.path)-1-self.path[::-1].index('/')] or '/'
+        elif path == '/':
             output = '/'
         elif path[0] == '/' and len(path) > 1:
             output = path
@@ -386,7 +393,7 @@ class Storage:
             output = self.path + ('/' if self.path[-1] != '/' else '') + path
 
         if self.pathExist(output):
-            self.path = path
+            self.path = output
     
     def correctPath(self,path:str):
         output = ''
@@ -462,17 +469,51 @@ class Storage:
         except: return False
         else: return True
 
+    # def compress(self,data:bytes):
+    #     return lzma.compress(data)
+    # def decompress(self,data:bytes): pass
+
+
+from tkinter.filedialog import askopenfilenames as fldialog
+
 if __name__ == "__main__":
     # s = Storage('storage-0.sxa')
-    # s.loadStorage()
+    s = Storage('storage-PHhdsD.sxa')
+    s.loadStorage()
     # print(s.metadata)
     # print(Fernet.generate_key())
-    # ns.newStorage('storage-PHhdsD.sxa')
-
     # ns = Storage()
+    # ns.newStorage('storage-PHhdsD.sxa')
+    # s.extractFile(filename='template-1.jpg',newfilename='template.jpg')
     # ns = Storage('storage-PHhdsD.sxa')
     # ns.loadStorage('storage-PHhdsD.sxa')
     # print(ns.metadata)
+
+    # s.addFolder(foldername='Angel Next Door')
+
+    # s.changePath('Angel Next Door')
+    # mps = s.getFile('Angel Next Door',filename='Angel Next Door [sub] (2).mkv')
+    # print(len(mps))
+    # print(s.dirList(s.correctPath('/Angel Next Door')))
+
+    # print(s.metadata)
+    # print(s.dirList())
+
+    # mps = fldialog()
+    # for x in mps:
+    #     print(s.addFile(x))
+
+    # print(s.folderList('/'))
+
+    # for x in dir(Storage): print(x)
+    # print(s.dirList())
+    # print(s.addFolder(foldername='Music'))
+    # print(s.changePath('Music'))
+    # print(s.path)
+    # print(s.dirList())
+    # print(s.changePath('..'))
+    # print(s.dirList())
+    # print(s.metadata)
 
     # s.sortStorage(newfile_path='storage-1.sxa')
     # ns = Storage('storage-1.sxa')
