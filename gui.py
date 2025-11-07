@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import (
     QApplication, QWidget, QTreeWidget, QTreeWidgetItem,
     QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLineEdit, QSplitter, QLabel, QMenu
+    QPushButton, QLineEdit, QSplitter, QLabel, QMenu, QDialog
 )
 from PySide6.QtCore import Qt
 
@@ -11,7 +11,9 @@ from storage import Storage
 # ---------------------------
 # Simulated functions (replace with your engine's methods)
 # ---------------------------
-s = Storage('storage-phhdsd.sxa')
+# s = Storage('storage-h3Sfj_.sxa')
+s = Storage('storage-tvkwsl.sxa')
+# s.newStorage()
 s.loadStorage()
 # def getPath():
 #     return "/"
@@ -44,6 +46,15 @@ def human_size(size):
 
 
 # ---------------------------
+# Quick Dialogs
+class QuickDialog(QDialog):
+    def __init__(self,parent=None,title="",style_code=0):
+        super().__init__(parent=parent)
+
+
+# ---------------------------
+
+# ---------------------------
 # File Manager Class
 # ---------------------------
 class CustomFileManager(QWidget):
@@ -56,16 +67,28 @@ class CustomFileManager(QWidget):
         main_layout = QVBoxLayout(self)
 
         # context menu
+        self.context = {}
+        self.subcontext = {}
+
         self.context = QMenu(self)
+
         self.contexti = {}
         self.contexti['addf'] = self.context.addAction('Add File')
-        self.contexti['newf'] = self.context.addAction('New Folder')
+        self.contexti['newf'] = self.context.addAction('New File')
+        self.contexti['newfo'] = self.context.addAction('New Folder')
         self.contexti['copy'] = self.context.addAction('Copy')
         self.contexti['move'] = self.context.addAction('Move')
         self.contexti['del'] = self.context.addAction('Delete')
         self.contexti['ren'] = self.context.addAction('Rename')
+
+        self.subcontext['newf'] = {}
+        self.subcontext['newf']['object'] = QMenu(self)
+        self.subcontext['newf']['items'] = {}
+        self.subcontext['newf']['items']['type.txt'] = self.subcontext['newf']['object'].addAction('New Text Document (txt)')
+        self.subcontext['newf']['items']['type.txt'].triggered.connect(lambda am='txt': self.newFile('',am))
+        self.contexti['newf'].setMenu(self.subcontext['newf']['object'])
         
-        self.contexti['newf'].triggered.connect(self.newFolder)
+        self.contexti['newfo'].triggered.connect(self.newFolder)
 
         # Path bar + Back Button
         path_layout = QHBoxLayout()
@@ -110,6 +133,9 @@ class CustomFileManager(QWidget):
 
     def newFolder(self,event): pass
         
+    def newFile(self,path,type): 
+        bm = QuickDialog(self)
+        bm.show()
 
     def contextMenuEvent(self,event):
         self.context.exec(event.globalPos())

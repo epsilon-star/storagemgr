@@ -1,8 +1,8 @@
 import json
 import os
-import pydub
-from pydub import AudioSegment
-from pydub.playback import play
+# import pydub
+# from pydub import AudioSegment
+# from pydub.playback import play
 import io
 from cryptography.fernet import Fernet
 
@@ -477,10 +477,10 @@ class Storage:
 from tkinter.filedialog import askopenfilenames as fldialog
 
 if __name__ == "__main__":
-    # s = Storage('storage-0.sxa')
-    s = Storage('storage-PHhdsD.sxa')
+    s = Storage('storage-0.sxa')
+    # s = Storage('storage-PHhdsD.sxa')
     s.loadStorage()
-    # print(s.metadata)
+    print(s.metadata)
     # print(Fernet.generate_key())
     # ns = Storage()
     # ns.newStorage('storage-PHhdsD.sxa')
